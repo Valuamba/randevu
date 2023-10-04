@@ -1,0 +1,62 @@
+version: "3.7"
+
+x-app-service: &admin-service
+    env_file: .env
+    image: randevu-admin
+    command: sh -c "/scripts/wait-for.sh pg:5432 -- /scripts/docker-entrypoint.admin.sh"
+    volumes:
+        - admin_static_data:/tmp/static
+        - admin_media_data:/tmp/media
+        - ./admin:/srv
+        - admin_logs:/srv/logs
+    depends_on:
+        - pg
+    environment:
+        - MEDIA_URL=/media/
+        - MEDIA_ROOT=/tmp/media/
+        - STATIC_URL=/static/
+        - STATIC_ROOT=/tmp/static/
+        - PG_HOST=pg
+        - PG_PORT=5432
+    networks:
+        - randevu-net
+
+services:
+    admin:
+        <<: *admin-service
+        ports:
+            - "45049:8000"
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    pg:
+        container_name: randevu-pg
+        image: postgres:13.3
+        volumes:
+            - postgres_db:/var/lib/postgresql/data
+        env_file: .env
+        environment:
+            - POSTGRES_USER=$POSTGRES_USER
+            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            - POSTGRES_DB=$POSTGRES_DB
+        ports:
+            - "45048:5432"
+        networks:
+            - randevu-net
+
+    redis:
+        container_name: randevu-redis
+        image: redis:6-alpine
+        ports:
+            - 6379:6379
+
+networks:
+    randevu-net:
+        driver: bridge
+
+volumes:
+  admin_static_data:
+  admin_media_data:
+  admin_logs:
+  postgres_db:

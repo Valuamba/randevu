@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+
+  admin:
+    image: randevu-admin
+    build:
+      dockerfile: ./deployment/django/Dockerfile
+      context: ./
+

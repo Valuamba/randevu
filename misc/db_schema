@@ -1,0 +1,236 @@
+//Client
+Table client {
+    id string [pk]
+    pkid int [increment]
+    created_at datetime
+    updated_at datetime
+    
+    full_name string
+    phone_number string
+    notes strign
+    is_deleted boolean
+  }
+  
+  //APPOINTMENT
+  Table appointment {
+    id string [pk]
+    pkid int [increment]
+    employee_id string [ref: - user.id]
+    category_id string [ref: - category.id]
+    service_id strign [ref: < service.id]
+    client_id string [ref: - client.id]
+    status appointment.status
+    created_at datetime
+    updated_at datetime
+    time_step int
+    day datetime
+    
+    Indexes{
+      (employee_id, day)
+    }
+  }
+  
+  //CATEGORY
+  Table category {
+    id string [pk]
+    pkid int [increment]
+    photo_name string
+    title string
+    created_at datetime
+    updated_at datetime
+    
+    is_deleted boolean
+  }
+  
+  //SERVICE
+  Table service {
+    id string [pk]
+    pkid int [increment]
+    name string
+    duration int
+    gender gender
+    category_id string [ref: - category.id]
+    created_at datetime
+    updated_at datetime
+    
+    is_deleted boolean
+  }
+  
+  //AsyncOperationCode
+  Table async_operation {
+    id string [pk]
+    pkid int [increment]
+    user_id string [ref: > user.id]
+    code string
+    operation_type async_operation.type
+    status async_operation.status
+    expired_at datetime
+    created_at datetime
+    updated_at datetime
+  }
+  
+  //USER
+  Ref: user.id <> service.id
+  
+  Table user { 
+    id string [pk] 
+    pkid int [increment] 
+    created_at datetime 
+    updated_at datetime
+    
+    email string 
+    password string
+    full_name string 
+    phone_number string 
+    photo_name string
+    position position
+    status user.status
+    multilanding_id string [ref: > multilanding.id]
+  
+    is_deleted boolean
+  } 
+    
+  Table staff.schedule {
+    id string [pk]
+    pkid int [increment]
+    created_at datetime
+    updated_at datetime
+    
+    week_day day_of_week
+    start_work_time_step int
+    end_work_time_step int
+    is_work boolean
+    
+    staff_id string [ref: - user.id]
+  }
+  
+  Table staff.break {
+    id string [pk]
+    pkid int [increment]
+    created_at datetime
+    updated_at datetime
+    
+    start_break_time_step int
+    steps_amount int
+    
+    schedule_id int [ref: > staff.schedule.id]
+  }
+  
+  
+  Table multilanding.domain { 
+    id string [pk] 
+    pkid int [increment] 
+    domain string 
+    created_at datetime 
+    updated_at datetime 
+  } 
+    
+  Table multilanding { 
+    id string [pk] 
+    pkid int [increment]
+    owner_id string [ref: - user.id]
+    multilanding_domain_id string [ref: - multilanding.domain.id] 
+    sub_domain string 
+    instagram_link string 
+    whatsapp_link string 
+    phone_number string 
+    created_at datetime 
+    updated_at datetime 
+    
+    is_deleted boolean
+  } 
+  
+  //multilanding: header, about
+  //category: desription, title
+  //service: currency, price
+  Table multilanding.language { 
+    id string [pk] 
+    pkid int [increment] 
+    lang_code string
+    locale string
+    
+    multilanding_id string [ref: > multilanding.id] 
+    created_at datetime 
+    updated_at datetime 
+  } 
+  
+  Table multilanding.gallery { 
+    id string [pk] 
+    pkid int [increment] 
+    multilanding_id string [ref: > multilanding.id] 
+    photo_name string 
+    created_at datetime 
+    updated_at datetime 
+  } 
+  
+  Table multilanding.schedule { 
+    id string [pk] 
+    pkid int [increment] 
+    multilanding_id string [ref: - multilanding.id] 
+    start_week_day int 
+    end_week_day int 
+    start_work_hours int 
+    end_work_hours int 
+    created_at datetime 
+    updated_at datetime 
+  } 
+  
+  Table multilanding.location { 
+    id string [pk] 
+    pkid int [increment] 
+    multilanding_id string [ref: - multilanding.id] 
+    country string 
+    city string 
+    street string 
+    address_details string 
+    lattitude string 
+    longttitude string 
+    google_api_key string 
+    created_at datetime 
+    updated_at datetime 
+  } 
+  
+  //ENUMS
+    
+  Enum day_of_week {
+    Monady
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+    Sunday
+  }
+    
+  Enum async_operation.type {
+    registration
+    password_recovery
+  }
+  
+  Enum async_operation.status {
+    waiting
+    applied
+    unused
+  }
+  
+  Enum appointment.status {
+    waiting
+    canceled
+    successed
+  }
+  
+  Enum gender { 
+    male 
+    female 
+  }   
+  
+  Enum user.status { 
+    working 
+    not_working
+    fired
+  } 
+  
+  Enum user.position {
+    admin
+    employee
+  }
